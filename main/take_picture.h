@@ -114,7 +114,7 @@
 #define CAM_PIN_D6 17
 #define CAM_PIN_D7 16
 #endif
-static const char *TAG = "example:take_picture";
+static const char *CAMERA_TAG = "example:take_picture";
 
 #if ESP_CAMERA_SUPPORTED
 static camera_config_t camera_config = {
@@ -156,7 +156,7 @@ static esp_err_t init_camera(void)
     esp_err_t err = esp_camera_init(&camera_config);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "Camera Init Failed");
+        ESP_LOGE(CAMERA_TAG, "Camera Init Failed");
         return err;
     }
 
@@ -164,3 +164,30 @@ static esp_err_t init_camera(void)
 }
 #endif
 
+void take_picture(void)
+{
+#if ESP_CAMERA_SUPPORTED
+    if(ESP_OK != init_camera()) {
+        ESP_LOGE(CAMERA_TAG, "Camera Init Failed");
+        return;
+    }
+
+    ESP_LOGI(CAMERA_TAG, "Camera Init Success");
+
+    while (1)
+    {
+        ESP_LOGI(CAMERA_TAG, "Taking picture...");
+        camera_fb_t *pic = esp_camera_fb_get();
+
+
+        // use pic->buf to access the image
+        ESP_LOGI(CAMERA_TAG, "Picture taken! Its size was: %zu bytes", pic->len);
+        esp_camera_fb_return(pic);
+
+        vTaskDelay(5000 / portTICK_RATE_MS);
+    }
+#else
+    ESP_LOGE(CAMERA_TAG, "Camera support is not available for this chip");
+    return;
+#endif
+}
