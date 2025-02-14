@@ -1,11 +1,44 @@
 #include <stdio.h>
 #include <inttypes.h>
+#include <esp_log.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_system.h"
+
+#include "take_picture.h"
+
+#define TAG "MAIN"
+
+void take_picture(void)
+{
+#if ESP_CAMERA_SUPPORTED
+    if(ESP_OK != init_camera()) {
+        ESP_LOGE(TAG, "Camera Init Failed");
+        return;
+    }
+
+    ESP_LOGI(TAG, "Camera Init Success");
+
+    while (1)
+    {
+        ESP_LOGI(TAG, "Taking picture...");
+        camera_fb_t *pic = esp_camera_fb_get();
+
+
+        // use pic->buf to access the image
+        ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
+        esp_camera_fb_return(pic);
+
+        vTaskDelay(5000 / portTICK_RATE_MS);
+    }
+#else
+    ESP_LOGE(TAG, "Camera support is not available for this chip");
+    return;
+#endif
+}
 
 void app_main(void)
 {
@@ -35,6 +68,9 @@ void app_main(void)
            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
+
+    take_picture();
+
 
     for (int i = 10; i >= 0; i--) {
         printf("Restarting in %d seconds...\n", i);
