@@ -191,3 +191,4 @@ void take_picture(void)
     return;
 #endif
 }
+

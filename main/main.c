@@ -9,6 +9,7 @@
 #include "take_picture.h"
 #include "wifi.h"
 #include "diagnostics.h"
+#include "http_server.h"
 
 static const char *MAIN_TAG = "MAIN";
 
@@ -29,14 +30,22 @@ void app_main(void)
 
     wifi_init_sta();
 
-    take_picture();
+    init_camera();
 
+    start_webserver();
 
-    for (int i = 10; i >= 0; i--) {
-        ESP_LOGI(MAIN_TAG, "Restarting in %d seconds...", i);
+    while (1) {
+        ESP_LOGI(MAIN_TAG, "Waiting for incoming connection...");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    ESP_LOGI(MAIN_TAG, "Restarting now.");
-    fflush(stdout);
-    esp_restart();
+        
+
+
+    // for (int i = 10; i >= 0; i--) {
+    //     ESP_LOGI(MAIN_TAG, "Restarting in %d seconds...", i);
+    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // }
+    // ESP_LOGI(MAIN_TAG, "Restarting now.");
+    // fflush(stdout);
+    // esp_restart();
 }
