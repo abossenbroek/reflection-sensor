@@ -1,0 +1,9 @@
+repos:
+  - repo: https://github.com/Takishima/cmake-pre-commit-hooks
+    rev: v1.9.6
+    hooks:
+      - id: clang-format
+        args: [--style=Google]
+      - id: clang-tidy
+        args: [--checks=readability-magic-numbers,--warnings-as-errors=*]
+
